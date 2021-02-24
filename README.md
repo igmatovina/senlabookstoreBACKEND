@@ -4,6 +4,8 @@ This was configuration for backend.
 Application was configured to communicate with postgresql repository.
 Fronted part will be done with Angular
 
+in postgresql you need to create table book
+
 Application properties 
 spring.datasource.url=jdbc:postgresql://localhost:5432/book
 spring.datasource.username=postgres
