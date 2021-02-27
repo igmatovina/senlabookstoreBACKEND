@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -58,7 +59,19 @@ public class BookListService {
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
 		marshaller.marshal(books, new FileOutputStream("booksExport.xml"));
+		
 		System.out.println("Books.xml is created successfully");
+	}
+	
+	public byte[] convertBookListToXml2(String fileName) throws JAXBException, PropertyException, IOException, URISyntaxException {
+		List<BookList> bookList = bookRepository.findAll();
+		com.bookstore.senla.model.Books books = new com.bookstore.senla.model.Books();
+		books.setBookList(bookList);
+		JAXBContext jaxbContext = JAXBContext.newInstance(com.bookstore.senla.model.Books.class);
+		Marshaller marshaller = jaxbContext.createMarshaller();
+		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+		marshaller.marshal(books, new FileOutputStream("src/main/resources/"+fileName));
+		return Files.readAllBytes(Paths.get(getClass().getClassLoader().getResource(fileName).toURI()));
 	}
 
 }

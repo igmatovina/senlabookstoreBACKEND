@@ -20,7 +20,6 @@ public class BookList {
             strategy = GenerationType.SEQUENCE,
             generator = "bookList_sequence"
     )
-
     private Long isbn;
     private String title;
     private String author;

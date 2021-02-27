@@ -3,21 +3,31 @@ package com.bookstore.senla;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.bookstore.senla.dao.BookRepository;
 import com.bookstore.senla.model.BookList;
 import com.bookstore.senla.services.BookListService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.http.HttpHeaders;
+import java.nio.file.Files;
 import java.util.List;
+import java.util.Optional;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBException;
 
 @SpringBootApplication
 @RestController
-@CrossOrigin(origins = "*")
+@CrossOrigin("*")
 public class BookstoresenlaApplication {
 
     @Autowired
@@ -41,15 +51,30 @@ public class BookstoresenlaApplication {
     }
 
     @GetMapping("/findBook/{title}")
-    public List<BookList> findBook(@PathVariable String name) {
-        return repository.findByTitle(name);
+    public List<BookList> findBook(@PathVariable String title) {
+        return repository.findByTitle(title);
     }
-
-    @DeleteMapping("/cancel/{id}")
-    public List<BookList> cancelRegistration(@PathVariable long id) {
-        repository.deleteById(id);
+    
+    @GetMapping("/getById/{isbn}")
+	public Optional<BookList> getBookById(@PathVariable Long isbn) {
+        return repository.findById(isbn);
+	}
+	
+    @GetMapping("/cancel/{isbn}")
+    public List<BookList> cancelRegistration(@PathVariable long isbn) {
+        repository.deleteById(isbn);
         return repository.findAll();
     }
+    
+    @PutMapping("/edit/{isbn}")
+    public List<BookList> editBook(@PathVariable long isbn, @RequestBody BookList booklistDetails) {
+    	BookList editedBook = repository.getOne(isbn);
+    	editedBook.setAuthor(booklistDetails.getAuthor());
+    	editedBook.setTitle(booklistDetails.getTitle());
+    	repository.save(editedBook);
+        return repository.findAll();
+    }
+    
     
     @PostMapping("/postxml")
     public void postBooks(@RequestPart("file") MultipartFile file)
@@ -68,7 +93,22 @@ public class BookstoresenlaApplication {
         bookListService.convertBookListToXml();
         return "Books converted to xml successfully";
     };
+    
+    @GetMapping(value ="/convertToXml2")
+    public void ConvertToXml2(String fileName, HttpServletResponse res) throws JAXBException, IOException, URISyntaxException {
+        res.setHeader("Content","attachment; filename="+ fileName);
+        res.setHeader("Content-type","text/xml; filename="+ fileName);
 
+        res.getOutputStream().write(bookListService.convertBookListToXml2(fileName));
+    };
+
+
+    
+   
+    
+    
+    
+    
     public static void main(String[] args) {
         SpringApplication.run(BookstoresenlaApplication.class, args);
     }
