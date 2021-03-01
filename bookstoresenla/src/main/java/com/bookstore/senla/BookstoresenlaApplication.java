@@ -106,26 +106,8 @@ public class BookstoresenlaApplication {
 	public ResponseEntity<Object> downloadFile() throws IOException, PropertyException, JAXBException
 	{
         bookListService.convertBookListToXml();
-        bookListService.downloadXml();
+        return bookListService.downloadXml();
         
-        
-		String filename = "booksExport.xml";
-		File file = new File(filename);
-		InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
-		
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Content-Disposition",
-				String.format("attachment; filename=\"%s\"", file.getName()));
-		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-		headers.add("Pragma", "no-cache");
-		headers.add("Expires", "0");
-		
-
-		ResponseEntity<Object> responseEntity = ResponseEntity.ok().headers(headers)
-				.contentLength(file.length())
-				.contentType(MediaType.parseMediaType("application/txt")).body(resource);
-
-		return responseEntity;
 	};   	
 
     
