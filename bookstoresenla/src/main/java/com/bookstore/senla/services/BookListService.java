@@ -1,6 +1,7 @@
 package com.bookstore.senla.services;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,6 +18,10 @@ import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -73,5 +78,24 @@ public class BookListService {
 		marshaller.marshal(books, new FileOutputStream("src/main/resources/"+fileName));
 		return Files.readAllBytes(Paths.get(getClass().getClassLoader().getResource(fileName).toURI()));
 	}
+	
+	public ResponseEntity<Object> downloadXml() throws FileNotFoundException {
+		String filename = "booksExport.xml";
+		File file = new File(filename);
+		InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-Disposition",
+				String.format("attachment; filename=\"%s\"", file.getName()));
+		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		headers.add("Pragma", "no-cache");
+		headers.add("Expires", "0");
+		ResponseEntity<Object> responseEntity = ResponseEntity.ok().headers(headers)
+				.contentLength(file.length())
+				.contentType(MediaType.parseMediaType("application/txt")).body(resource);
+		return responseEntity;
+
+		
+	}
+
 
 }

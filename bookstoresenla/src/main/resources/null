@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Books>
+    <Book isbn="1">
+        <author>Charles</author>
+        <title>Book title</title>
+    </Book>
+    <Book isbn="2">
+        <author>Charles2</author>
+        <title>Book title2</title>
+    </Book>
+    <Book isbn="3">
+        <author>Charles3</author>
+        <title>Book title3</title>
+    </Book>
+</Books>

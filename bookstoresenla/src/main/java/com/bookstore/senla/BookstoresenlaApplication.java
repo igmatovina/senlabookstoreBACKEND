@@ -3,27 +3,35 @@ package com.bookstore.senla;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.HttpHeaders;
 
 import com.bookstore.senla.dao.BookRepository;
 import com.bookstore.senla.model.BookList;
 import com.bookstore.senla.services.BookListService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.http.HttpHeaders;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.PropertyException;
 
 @SpringBootApplication
 @RestController
@@ -94,20 +102,32 @@ public class BookstoresenlaApplication {
         return "Books converted to xml successfully";
     };
     
-    @GetMapping(value ="/convertToXml2")
-    public void ConvertToXml2(String fileName, HttpServletResponse res) throws JAXBException, IOException, URISyntaxException {
-        res.setHeader("Content","attachment; filename="+ fileName);
-        res.setHeader("Content-type","text/xml; filename="+ fileName);
+    @GetMapping(value ="/download")
+	public ResponseEntity<Object> downloadFile() throws IOException, PropertyException, JAXBException
+	{
+        bookListService.convertBookListToXml();
+        bookListService.downloadXml();
+        
+        
+		String filename = "booksExport.xml";
+		File file = new File(filename);
+		InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-Disposition",
+				String.format("attachment; filename=\"%s\"", file.getName()));
+		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+		headers.add("Pragma", "no-cache");
+		headers.add("Expires", "0");
+		
 
-        res.getOutputStream().write(bookListService.convertBookListToXml2(fileName));
-    };
+		ResponseEntity<Object> responseEntity = ResponseEntity.ok().headers(headers)
+				.contentLength(file.length())
+				.contentType(MediaType.parseMediaType("application/txt")).body(resource);
 
+		return responseEntity;
+	};   	
 
-    
-   
-    
-    
-    
     
     public static void main(String[] args) {
         SpringApplication.run(BookstoresenlaApplication.class, args);
