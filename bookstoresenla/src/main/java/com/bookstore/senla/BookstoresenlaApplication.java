@@ -23,7 +23,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
-import java.net.http.HttpHeaders;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
@@ -96,37 +95,32 @@ public class BookstoresenlaApplication {
 
     }
     
-    @GetMapping(value ="/convertToXml")
-    public String ConvertToXml() throws JAXBException, FileNotFoundException {
-        bookListService.convertBookListToXml();
-        return "Books converted to xml successfully";
-    };
+//    @GetMapping(value ="/convertToXml")
+//    public String ConvertToXml() throws JAXBException, FileNotFoundException {
+//        bookListService.convertBookListToXml();
+//        return "Books converted to xml successfully";
+//    };
     
-    @GetMapping(value ="/download")
-	public ResponseEntity<InputStreamResource> downloadFile() throws IOException, PropertyException, JAXBException
-	{
-        bookListService.convertBookListToXml();
-        return bookListService.downloadXml();
-        
-	};
 	
     @GetMapping(value ="/downloadXml")
-	public ResponseEntity<InputStreamResource> downloadFile2() throws IOException, PropertyException, JAXBException
-	{
-        bookListService.convertBookListToXml();
-        return bookListService.downloadXml();
-        
-	};
-	
-    @GetMapping(value ="/downloadYoutube")
 	public void downloadFile2(String fileName,HttpServletResponse response) throws Exception
 	{
+    	if(fileName.endsWith(" ")) { fileName =  fileName.substring(0,fileName.length()-1);}
+       bookListService.convertBookListToXml(fileName);
        response.setHeader("Content-Disposition","attachment; filename"+ fileName);
        response.getOutputStream().write(bookListService.writeContentOf(fileName));  
 	}
     
     
-    
+//    @GetMapping(value ="/downloadXml")
+//	public ResponseEntity<InputStreamResource> downloadFile2() throws IOException, PropertyException, JAXBException
+//	{
+//        bookListService.convertBookListToXml();
+//        return bookListService.downloadXml();
+//        
+//	}
+	
+	
     public static void main(String[] args) {
         SpringApplication.run(BookstoresenlaApplication.class, args);
     }

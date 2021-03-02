@@ -58,18 +58,7 @@ public class BookListService {
 		}
 	}
 
-	public void convertBookListToXml() throws JAXBException, PropertyException, FileNotFoundException {
-		List<BookList> bookList = bookRepository.findAll();
-		com.bookstore.senla.model.Books books = new com.bookstore.senla.model.Books();
-		books.setBookList(bookList);
-		JAXBContext jaxbContext = JAXBContext.newInstance(com.bookstore.senla.model.Books.class);
-		Marshaller marshaller = jaxbContext.createMarshaller();
-		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-		marshaller.marshal(books, new FileOutputStream("booksExport.xml"));
-		System.out.println("Books.xml is created successfully");
-	}
-	
-	public byte[] convertBookListToXml2(String fileName) throws JAXBException, PropertyException, IOException, URISyntaxException {
+	public void convertBookListToXml(String fileName) throws JAXBException, PropertyException, FileNotFoundException {
 		List<BookList> bookList = bookRepository.findAll();
 		com.bookstore.senla.model.Books books = new com.bookstore.senla.model.Books();
 		books.setBookList(bookList);
@@ -77,14 +66,12 @@ public class BookListService {
 		Marshaller marshaller = jaxbContext.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 		marshaller.marshal(books, new FileOutputStream("src/main/resources/"+fileName));
-		return Files.readAllBytes(Paths.get(getClass().getClassLoader().getResource(fileName).toURI()));
+		System.out.println("booksExport.xml is created successfully");
 	}
 	
 	public byte[] writeContentOf(String fileName) throws Exception{
 		return Files.readAllBytes(Paths.get(getClass().getClassLoader().getResource(fileName).toURI()));
 	}
-	
-	
 	
 	
 	public ResponseEntity<InputStreamResource> downloadXml() throws IOException {
@@ -101,23 +88,16 @@ public class BookListService {
 		File file = new File("src/main/resources/booksExport.xml");
 		return new ByteArrayInputStream(Files.readAllBytes(file.toPath()));
 	}
-	
-	
-//	public ResponseEntity<Object> downloadXml() throws FileNotFoundException {
-//		String filename = "booksExport.xml";
-//		File file = new File(filename);
-//		InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
-//		HttpHeaders headers = new HttpHeaders();
-//		headers.add("Content-Disposition",
-//				String.format("attachment; filename=\"%s\"", file.getName()));
-//		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-//		headers.add("Pragma", "no-cache");
-//		headers.add("Expires", "0");
-//		ResponseEntity<Object> responseEntity = ResponseEntity.ok().headers(headers)
-//				.contentLength(file.length())
-//				.contentType(MediaType.parseMediaType("application/txt")).body(resource);
-//		return responseEntity;
+//	
+//	
+//	public byte[] convertBookListToXml2(String fileName) throws JAXBException, PropertyException, IOException, URISyntaxException {
+//		List<BookList> bookList = bookRepository.findAll();
+//		com.bookstore.senla.model.Books books = new com.bookstore.senla.model.Books();
+//		books.setBookList(bookList);
+//		JAXBContext jaxbContext = JAXBContext.newInstance(com.bookstore.senla.model.Books.class);
+//		Marshaller marshaller = jaxbContext.createMarshaller();
+//		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+//		marshaller.marshal(books, new FileOutputStream("src/main/resources/"+fileName));
+//		return Files.readAllBytes(Paths.get(getClass().getClassLoader().getResource(fileName).toURI()));
 //	}
-
-
 }
