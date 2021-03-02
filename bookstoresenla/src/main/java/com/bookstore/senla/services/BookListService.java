@@ -1,5 +1,6 @@
 package com.bookstore.senla.services;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -36,6 +37,8 @@ public class BookListService {
 	public BookListService(BookRepository bookRepository) {
 		this.bookRepository = bookRepository;
 	}
+	
+	
 
 	public void postXmlBooks(MultipartFile file) throws JAXBException {
 		try {
@@ -62,9 +65,7 @@ public class BookListService {
 		JAXBContext jaxbContext = JAXBContext.newInstance(com.bookstore.senla.model.Books.class);
 		Marshaller marshaller = jaxbContext.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
 		marshaller.marshal(books, new FileOutputStream("booksExport.xml"));
-		
 		System.out.println("Books.xml is created successfully");
 	}
 	
@@ -79,23 +80,44 @@ public class BookListService {
 		return Files.readAllBytes(Paths.get(getClass().getClassLoader().getResource(fileName).toURI()));
 	}
 	
-	public ResponseEntity<Object> downloadXml() throws FileNotFoundException {
-		String filename = "booksExport.xml";
-		File file = new File(filename);
-		InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
-		HttpHeaders headers = new HttpHeaders();
-		headers.add("Content-Disposition",
-				String.format("attachment; filename=\"%s\"", file.getName()));
-		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-		headers.add("Pragma", "no-cache");
-		headers.add("Expires", "0");
-		ResponseEntity<Object> responseEntity = ResponseEntity.ok().headers(headers)
-				.contentLength(file.length())
-				.contentType(MediaType.parseMediaType("application/txt")).body(resource);
-		return responseEntity;
-
-		
+	public byte[] writeContentOf(String fileName) throws Exception{
+		return Files.readAllBytes(Paths.get(getClass().getClassLoader().getResource(fileName).toURI()));
 	}
+	
+	
+	
+	
+	public ResponseEntity<InputStreamResource> downloadXml() throws IOException {
+		ByteArrayInputStream in = generateFile();
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-Disposition", "attachment; filename=booksExport.xml");
+		return ResponseEntity
+		              .ok()
+		              .headers(headers)
+		              .body(new InputStreamResource(in));
+		}
+	
+	public ByteArrayInputStream  generateFile() throws IOException{
+		File file = new File("src/main/resources/booksExport.xml");
+		return new ByteArrayInputStream(Files.readAllBytes(file.toPath()));
+	}
+	
+	
+//	public ResponseEntity<Object> downloadXml() throws FileNotFoundException {
+//		String filename = "booksExport.xml";
+//		File file = new File(filename);
+//		InputStreamResource resource = new InputStreamResource(new FileInputStream(file));
+//		HttpHeaders headers = new HttpHeaders();
+//		headers.add("Content-Disposition",
+//				String.format("attachment; filename=\"%s\"", file.getName()));
+//		headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+//		headers.add("Pragma", "no-cache");
+//		headers.add("Expires", "0");
+//		ResponseEntity<Object> responseEntity = ResponseEntity.ok().headers(headers)
+//				.contentLength(file.length())
+//				.contentType(MediaType.parseMediaType("application/txt")).body(resource);
+//		return responseEntity;
+//	}
 
 
 }

@@ -103,13 +103,29 @@ public class BookstoresenlaApplication {
     };
     
     @GetMapping(value ="/download")
-	public ResponseEntity<Object> downloadFile() throws IOException, PropertyException, JAXBException
+	public ResponseEntity<InputStreamResource> downloadFile() throws IOException, PropertyException, JAXBException
 	{
         bookListService.convertBookListToXml();
         return bookListService.downloadXml();
         
-	};   	
-
+	};
+	
+    @GetMapping(value ="/downloadXml")
+	public ResponseEntity<InputStreamResource> downloadFile2() throws IOException, PropertyException, JAXBException
+	{
+        bookListService.convertBookListToXml();
+        return bookListService.downloadXml();
+        
+	};
+	
+    @GetMapping(value ="/downloadYoutube")
+	public void downloadFile2(String fileName,HttpServletResponse response) throws Exception
+	{
+       response.setHeader("Content-Disposition","attachment; filename"+ fileName);
+       response.getOutputStream().write(bookListService.writeContentOf(fileName));  
+	}
+    
+    
     
     public static void main(String[] args) {
         SpringApplication.run(BookstoresenlaApplication.class, args);
