@@ -16,3 +16,8 @@ spring.jpa.hibernate.ddl-auto=create-drop
 spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 spring.jpa.properties.hibernate.format_sql=true
+
+Post xml can be done only by postman 
+http://localhost:8080/postxml
+
+Trying to fix bug with downloading(download new file only after refresh)
