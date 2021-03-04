@@ -4,6 +4,8 @@ This was configuration for backend.
 Application was configured to communicate with postgresql repository.
 Fronted part will be done with Angular
 
+This backend part must be run on port 8080
+
 in postgresql you need to create table book
 
 Application properties 
